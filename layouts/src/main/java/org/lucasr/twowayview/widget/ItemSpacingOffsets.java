@@ -2,7 +2,6 @@ package org.lucasr.twowayview.widget;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import org.lucasr.twowayview.TwoWayLayoutManager.Direction;
 import org.lucasr.twowayview.widget.Lanes.LaneInfo;
@@ -50,9 +49,11 @@ class ItemSpacingOffsets {
             previousPosition--;
         }
 
-        final int previousLaneSpan = lm.getLaneSpanForPosition(previousPosition);
-        if (previousLane == 0) {
-            return (lane == previousLane + previousLaneSpan);
+        if(previousPosition>=0) {
+            final int previousLaneSpan = lm.getLaneSpanForPosition(previousPosition);
+            if (previousLane == 0) {
+                return (lane == previousLane + previousLaneSpan);
+            }
         }
 
         return false;
@@ -90,7 +91,7 @@ class ItemSpacingOffsets {
         // TODO: Figure out a robust way to compute this for layouts
         // that are dynamically placed and might span multiple lanes.
         if (lm instanceof SpannableGridLayoutManager ||
-            lm instanceof StaggeredGridLayoutManager) {
+                lm instanceof StaggeredGridLayoutManager) {
             return false;
         }
 

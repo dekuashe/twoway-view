@@ -39,15 +39,17 @@ import java.util.List;
 public abstract class TwoWayLayoutManager extends LayoutManager {
     private static final String LOGTAG = "TwoWayLayoutManager";
 
-    public static enum Orientation {
+    public enum Orientation {
         HORIZONTAL,
         VERTICAL
     }
 
-    public static enum Direction {
+    public enum Direction {
         START,
         END
     }
+
+    private int mScreenOrientation;
 
     private RecyclerView mRecyclerView;
 
@@ -63,9 +65,13 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
     public TwoWayLayoutManager(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
+        this.mScreenOrientation = context.getResources().getConfiguration().orientation;
     }
 
     public TwoWayLayoutManager(Context context, AttributeSet attrs, int defStyle) {
+
+        this.mScreenOrientation = context.getResources().getConfiguration().orientation;
+
         final TypedArray a =
                 context.obtainStyledAttributes(attrs, R.styleable.twowayview_TwoWayLayoutManager, defStyle, 0);
 
@@ -86,6 +92,14 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
     public TwoWayLayoutManager(Orientation orientation) {
         mIsVertical = (orientation == Orientation.VERTICAL);
+    }
+
+    public void setScreenOrientation(int orientation) {
+        this.mScreenOrientation = orientation;
+    }
+
+    public int getScreenOrientation() {
+        return mScreenOrientation;
     }
 
     private int getTotalSpace() {
@@ -224,7 +238,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
         final int absDelta = Math.abs(delta);
         if (canAddMoreViews(Direction.START, start - absDelta) ||
-            canAddMoreViews(Direction.END, end + absDelta)) {
+                canAddMoreViews(Direction.END, end + absDelta)) {
             fillGap(direction, recycler, state);
         }
 
@@ -273,7 +287,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     private void fillSpecific(int position, Recycler recycler, State state) {
-        if (state.getItemCount() <= 0) {
+        if (state.getItemCount() == 0) {
             return;
         }
 
