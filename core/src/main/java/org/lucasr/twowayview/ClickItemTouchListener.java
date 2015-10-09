@@ -43,6 +43,11 @@ abstract class ClickItemTouchListener implements OnItemTouchListener {
     }
 
     @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        //TODO
+    }
+
+    @Override
     public void onTouchEvent(RecyclerView recyclerView, MotionEvent event) {
         // We can silently track tap and and long presses by silently
         // intercepting touch events in the host RecyclerView.
