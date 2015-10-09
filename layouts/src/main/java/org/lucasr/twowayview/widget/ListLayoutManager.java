@@ -35,7 +35,7 @@ public class ListLayoutManager extends BaseLayoutManager {
     }
 
     public ListLayoutManager(Context context, Orientation orientation) {
-        super(orientation);
+        super(context, orientation);
     }
 
     @Override

@@ -87,8 +87,8 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
         super(context, attrs, defStyle, DEFAULT_NUM_COLS, DEFAULT_NUM_ROWS);
     }
 
-    public StaggeredGridLayoutManager(Orientation orientation, int numColumns, int numRows) {
-        super(orientation, numColumns, numRows);
+    public StaggeredGridLayoutManager(Context context, Orientation orientation, int numColumns, int numRows) {
+        super(context, orientation, numColumns, numRows);
     }
 
     @Override

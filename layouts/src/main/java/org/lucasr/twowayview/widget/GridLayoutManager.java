@@ -57,8 +57,8 @@ public class GridLayoutManager extends BaseLayoutManager {
         a.recycle();
     }
 
-    public GridLayoutManager(Orientation orientation, int numColumns, int numRows) {
-        super(orientation);
+    public GridLayoutManager(Context context, Orientation orientation, int numColumns, int numRows) {
+        super(context, orientation);
         mNumColumns = numColumns;
         mNumRows = numRows;
 

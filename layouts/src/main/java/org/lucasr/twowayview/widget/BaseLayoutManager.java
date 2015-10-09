@@ -150,8 +150,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         super(context, attrs, defStyle);
     }
 
-    public BaseLayoutManager(Orientation orientation) {
-        super(orientation);
+    public BaseLayoutManager(Context context, Orientation orientation) {
+        super(context, orientation);
     }
 
     protected void pushChildFrame(ItemEntry entry, Rect childFrame, int lane, int laneSpan,

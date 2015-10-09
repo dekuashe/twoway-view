@@ -65,33 +65,36 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
     public TwoWayLayoutManager(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-        this.mScreenOrientation = context.getResources().getConfiguration().orientation;
     }
 
     public TwoWayLayoutManager(Context context, AttributeSet attrs, int defStyle) {
-
-        this.mScreenOrientation = context.getResources().getConfiguration().orientation;
-
         final TypedArray a =
                 context.obtainStyledAttributes(attrs, R.styleable.twowayview_TwoWayLayoutManager, defStyle, 0);
+        try {
+            final int indexCount = a.getIndexCount();
+            for (int i = 0; i < indexCount; i++) {
+                final int attr = a.getIndex(i);
 
-        final int indexCount = a.getIndexCount();
-        for (int i = 0; i < indexCount; i++) {
-            final int attr = a.getIndex(i);
-
-            if (attr == R.styleable.twowayview_TwoWayLayoutManager_android_orientation) {
-                final int orientation = a.getInt(attr, -1);
-                if (orientation >= 0) {
-                    setOrientation(Orientation.values()[orientation]);
+                if (attr == R.styleable.twowayview_TwoWayLayoutManager_android_orientation) {
+                    final int orientation = a.getInt(attr, -1);
+                    if (orientation >= 0) {
+                        setOrientation(Orientation.values()[orientation]);
+                    }
                 }
             }
+        } finally {
+            a.recycle();
         }
-
-        a.recycle();
+        init(context);
     }
 
-    public TwoWayLayoutManager(Orientation orientation) {
+    public TwoWayLayoutManager(Context context, Orientation orientation) {
         mIsVertical = (orientation == Orientation.VERTICAL);
+        init(context);
+    }
+
+    public void init(Context context) {
+        this.mScreenOrientation = context.getResources().getConfiguration().orientation;
     }
 
     public void setScreenOrientation(int orientation) {
