@@ -19,22 +19,13 @@ package org.lucasr.twowayview.widget;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
-import android.util.AttributeSet;
 
-import org.lucasr.twowayview.widget.Lanes.LaneInfo;
+import org.lucasr.twowayview.widget.Spans.LaneInfo;
 
 public class ListLayoutManager extends BaseLayoutManager {
     private static final String LOGTAG = "ListLayoutManager";
 
-    public ListLayoutManager(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public ListLayoutManager(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    public ListLayoutManager(Context context, Orientation orientation) {
+    public ListLayoutManager(Context context, int orientation) {
         super(context, orientation);
     }
 
@@ -44,12 +35,12 @@ public class ListLayoutManager extends BaseLayoutManager {
     }
 
     @Override
-    void getLaneForPosition(LaneInfo outInfo, int position, Direction direction) {
+    void getLaneForPosition(LaneInfo outInfo, int position, int direction) {
         outInfo.set(0, 0);
     }
 
     @Override
     void moveLayoutToPosition(int position, int offset, Recycler recycler, State state) {
-        getLanes().reset(offset);
+        getLanes().resetForOffset(offset);
     }
 }

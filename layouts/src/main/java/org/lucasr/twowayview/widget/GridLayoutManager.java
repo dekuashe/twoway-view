@@ -17,58 +17,26 @@
 package org.lucasr.twowayview.widget;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
-import android.util.AttributeSet;
 import android.view.View;
 
-import org.lucasr.twowayview.widget.Lanes.LaneInfo;
+import org.lucasr.twowayview.widget.Spans.LaneInfo;
 
 public class GridLayoutManager extends BaseLayoutManager {
     private static final String LOGTAG = "GridLayoutManager";
 
-    private static final int DEFAULT_NUM_COLS = 2;
-    private static final int DEFAULT_NUM_ROWS = 2;
-
     private int mNumColumns;
     private int mNumRows;
 
-    public GridLayoutManager(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public GridLayoutManager(Context context, AttributeSet attrs, int defStyle) {
-        this(context, attrs, defStyle, DEFAULT_NUM_COLS, DEFAULT_NUM_ROWS);
-    }
-
-    protected GridLayoutManager(Context context, AttributeSet attrs, int defStyle,
-                                int defaultNumColumns, int defaultNumRows) {
-        super(context, attrs, defStyle);
-
-        final TypedArray a =
-                context.obtainStyledAttributes(attrs, R.styleable.twowayview_GridLayoutManager, defStyle, 0);
-
-        mNumColumns =
-                Math.max(1, a.getInt(R.styleable.twowayview_GridLayoutManager_twowayview_numColumns, defaultNumColumns));
-        mNumRows =
-                Math.max(1, a.getInt(R.styleable.twowayview_GridLayoutManager_twowayview_numRows, defaultNumRows));
-
-        a.recycle();
-    }
-
-    public GridLayoutManager(Context context, Orientation orientation, int numColumns, int numRows) {
+    public GridLayoutManager(Context context, int orientation) {
         super(context, orientation);
-        mNumColumns = numColumns;
-        mNumRows = numRows;
+    }
 
-        if (mNumColumns < 1) {
-            throw new IllegalArgumentException("GridLayoutManager must have at least 1 column");
-        }
-
-        if (mNumRows < 1) {
-            throw new IllegalArgumentException("GridLayoutManager must have at least 1 row");
-        }
+    public GridLayoutManager(Context context, int orientation, int mNumColumns, int mNumRows) {
+        super(context, orientation);
+        this.mNumColumns = mNumColumns;
+        this.mNumRows = mNumRows;
     }
 
     @Override
@@ -77,30 +45,30 @@ public class GridLayoutManager extends BaseLayoutManager {
     }
 
     @Override
-    void getLaneForPosition(LaneInfo outInfo, int position, Direction direction) {
+    void getLaneForPosition(LaneInfo outInfo, int position, int direction) {
         final int lane = (position % getLaneCount());
         outInfo.set(lane, lane);
     }
 
     @Override
     void moveLayoutToPosition(int position, int offset, Recycler recycler, State state) {
-        final Lanes lanes = getLanes();
-        lanes.reset(offset);
+        final Spans spans = getLanes();
+        spans.resetForOffset(offset);
 
-        getLaneForPosition(mTempLaneInfo, position, Direction.END);
+        getLaneForPosition(mTempLaneInfo, position, DIRECTION_END);
         final int lane = mTempLaneInfo.startLane;
         if (lane == 0) {
             return;
         }
 
         final View child = recycler.getViewForPosition(position);
-        measureChild(child, Direction.END);
+        measureChild(child, DIRECTION_END);
 
         final int dimension =
                 (isVertical() ? getDecoratedMeasuredHeight(child) : getDecoratedMeasuredWidth(child));
 
         for (int i = lane - 1; i >= 0; i--) {
-            lanes.offset(i, dimension);
+            spans.offset(i, dimension);
         }
     }
 

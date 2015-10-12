@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import org.lucasr.twowayview.TwoWayLayoutManager;
-import org.lucasr.twowayview.TwoWayLayoutManager.Orientation;
 
 import java.lang.reflect.Constructor;
 
@@ -93,12 +92,12 @@ public class TwoWayView extends RecyclerView {
         super.setLayoutManager(layout);
     }
 
-    public Orientation getOrientation() {
+    public int getOrientation() {
         TwoWayLayoutManager layout = (TwoWayLayoutManager) getLayoutManager();
         return layout.getOrientation();
     }
 
-    public void setOrientation(Orientation orientation) {
+    public void setOrientation(int orientation) {
         TwoWayLayoutManager layout = (TwoWayLayoutManager) getLayoutManager();
         layout.setOrientation(orientation);
     }

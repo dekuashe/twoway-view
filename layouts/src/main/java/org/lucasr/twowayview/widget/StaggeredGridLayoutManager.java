@@ -28,13 +28,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.lucasr.twowayview.widget.Lanes.LaneInfo;
+import org.lucasr.twowayview.widget.Spans.LaneInfo;
 
 public class StaggeredGridLayoutManager extends GridLayoutManager {
     private static final String LOGTAG = "StaggeredGridLayoutManager";
-
-    private static final int DEFAULT_NUM_COLS = 2;
-    private static final int DEFAULT_NUM_ROWS = 2;
 
     protected static class StaggeredItemEntry extends BaseLayoutManager.ItemEntry {
         private final int span;
@@ -75,19 +72,11 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
         };
     }
 
-    public StaggeredGridLayoutManager(Context context) {
-        this(context, null);
+    public StaggeredGridLayoutManager(Context context, int orientation) {
+        super(context, orientation);
     }
 
-    public StaggeredGridLayoutManager(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public StaggeredGridLayoutManager(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle, DEFAULT_NUM_COLS, DEFAULT_NUM_ROWS);
-    }
-
-    public StaggeredGridLayoutManager(Context context, Orientation orientation, int numColumns, int numRows) {
+    public StaggeredGridLayoutManager(Context context, int orientation, int numColumns, int numRows) {
         super(context, orientation, numColumns, numRows);
     }
 
@@ -108,7 +97,7 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
     }
 
     @Override
-    void getLaneForPosition(LaneInfo outInfo, int position, Direction direction) {
+    void getLaneForPosition(LaneInfo outInfo, int position, int direction) {
         final StaggeredItemEntry entry = (StaggeredItemEntry) getItemEntryForPosition(position);
         if (entry != null) {
             outInfo.set(entry.startLane, entry.anchorLane);
@@ -119,7 +108,7 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
     }
 
     @Override
-    void getLaneForChild(LaneInfo outInfo, View child, Direction direction) {
+    void getLaneForChild(LaneInfo outInfo, View child, int direction) {
         super.getLaneForChild(outInfo, child, direction);
         if (outInfo.isUndefined()) {
             getLanes().findLane(outInfo, getLaneSpanForChild(child), direction);
@@ -129,9 +118,9 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
     @Override
     void moveLayoutToPosition(int position, int offset, Recycler recycler, State state) {
         final boolean isVertical = isVertical();
-        final Lanes lanes = getLanes();
+        final Spans spans = getLanes();
 
-        lanes.reset(0);
+        spans.resetForOffset(0);
 
         for (int i = 0; i <= position; i++) {
             StaggeredItemEntry entry = (StaggeredItemEntry) getItemEntryForPosition(i);
@@ -139,15 +128,15 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
             if (entry != null) {
                 mTempLaneInfo.set(entry.startLane, entry.anchorLane);
 
-                // The lanes might have been invalidated because an added or
+                // The spans might have been invalidated because an added or
                 // removed item. See BaseLayoutManager.invalidateItemLanes().
                 if (mTempLaneInfo.isUndefined()) {
-                    lanes.findLane(mTempLaneInfo, getLaneSpanForPosition(i), Direction.END);
+                    spans.findLane(mTempLaneInfo, getLaneSpanForPosition(i), DIRECTION_END);
                     entry.setLane(mTempLaneInfo);
                 }
 
-                lanes.getChildFrame(mTempRect, entry.width, entry.height, mTempLaneInfo,
-                        Direction.END);
+                spans.getChildFrame(mTempRect, entry.width, entry.height, mTempLaneInfo,
+                        DIRECTION_END);
             } else {
                 final View child = recycler.getViewForPosition(i);
 
@@ -156,31 +145,31 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
                 // child views. We might need to add different policies based
                 // on known assumptions regarding certain layouts e.g. child
                 // views have stable aspect ratio, lane size is fixed, etc.
-                measureChild(child, Direction.END);
+                measureChild(child, DIRECTION_END);
 
                 // The measureChild() call ensures an entry is created for
                 // this position.
                 entry = (StaggeredItemEntry) getItemEntryForPosition(i);
 
                 mTempLaneInfo.set(entry.startLane, entry.anchorLane);
-                lanes.getChildFrame(mTempRect, getDecoratedMeasuredWidth(child),
-                        getDecoratedMeasuredHeight(child), mTempLaneInfo, Direction.END);
+                spans.getChildFrame(mTempRect, getDecoratedMeasuredWidth(child),
+                        getDecoratedMeasuredHeight(child), mTempLaneInfo, DIRECTION_END);
 
                 cacheItemFrame(entry, mTempRect);
             }
 
             if (i != position) {
-                pushChildFrame(entry, mTempRect, entry.startLane, entry.span, Direction.END);
+                pushChildFrame(entry, mTempRect, entry.startLane, entry.span, DIRECTION_END);
             }
         }
 
-        lanes.getLane(mTempLaneInfo.startLane, mTempRect);
-        lanes.reset(Direction.END);
-        lanes.offset(offset - (isVertical ? mTempRect.bottom : mTempRect.right));
+        spans.getLane(mTempLaneInfo.startLane, mTempRect);
+        spans.resetForDirection(DIRECTION_END);
+        spans.offset(offset - (isVertical ? mTempRect.bottom : mTempRect.right));
     }
 
     @Override
-    ItemEntry cacheChildLaneAndSpan(View child, Direction direction) {
+    ItemEntry cacheChildLaneAndSpan(View child, int direction) {
         final int position = getPosition(child);
 
         mTempLaneInfo.setUndefined();

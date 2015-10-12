@@ -17,11 +17,11 @@
 package org.lucasr.twowayview.widget;
 
 import android.graphics.Rect;
+import android.support.v7.widget.RecyclerView;
 
-import org.lucasr.twowayview.TwoWayLayoutManager.Direction;
-import org.lucasr.twowayview.TwoWayLayoutManager.Orientation;
+import org.lucasr.twowayview.TwoWayLayoutManager;
 
-class Lanes {
+class Spans {
     public static final int NO_LANE = -1;
 
     private final BaseLayoutManager mLayout;
@@ -55,9 +55,9 @@ class Lanes {
         }
     }
 
-    public Lanes(BaseLayoutManager layout, Orientation orientation, Rect[] lanes, int laneSize) {
+    public Spans(BaseLayoutManager layout, int orientation, Rect[] lanes, int laneSize) {
         mLayout = layout;
-        mIsVertical = (orientation == Orientation.VERTICAL);
+        mIsVertical = (orientation == RecyclerView.VERTICAL);
         mLanes = lanes;
         mLaneSize = laneSize;
 
@@ -67,7 +67,7 @@ class Lanes {
         }
     }
 
-    public Lanes(BaseLayoutManager layout, int laneCount) {
+    public Spans(BaseLayoutManager layout, int laneCount) {
         mLayout = layout;
         mIsVertical = layout.isVertical();
 
@@ -114,8 +114,8 @@ class Lanes {
         mInnerEnd = null;
     }
 
-    public Orientation getOrientation() {
-        return (mIsVertical ? Orientation.VERTICAL : Orientation.HORIZONTAL);
+    public int getOrientation() {
+        return (mIsVertical ? RecyclerView.VERTICAL : RecyclerView.HORIZONTAL);
     }
 
     public void save() {
@@ -160,12 +160,12 @@ class Lanes {
         laneRect.set(mLanes[lane]);
     }
 
-    public int pushChildFrame(Rect outRect, int lane, int margin, Direction direction) {
+    public int pushChildFrame(Rect outRect, int lane, int margin, int direction) {
         final int delta;
 
         final Rect laneRect = mLanes[lane];
         if (mIsVertical) {
-            if (direction == Direction.END) {
+            if (direction == TwoWayLayoutManager.DIRECTION_END) {
                 delta = outRect.top - laneRect.bottom;
                 laneRect.bottom = outRect.bottom + margin;
             } else {
@@ -173,7 +173,7 @@ class Lanes {
                 laneRect.top = outRect.top - margin;
             }
         } else {
-            if (direction == Direction.END) {
+            if (direction == TwoWayLayoutManager.DIRECTION_END) {
                 delta = outRect.left - laneRect.right;
                 laneRect.right = outRect.right + margin;
             } else {
@@ -187,16 +187,16 @@ class Lanes {
         return delta;
     }
 
-    public void popChildFrame(Rect outRect, int lane, int margin, Direction direction) {
+    public void popChildFrame(Rect outRect, int lane, int margin, int direction) {
         final Rect laneRect = mLanes[lane];
         if (mIsVertical) {
-            if (direction == Direction.END) {
+            if (direction == TwoWayLayoutManager.DIRECTION_END) {
                 laneRect.top = outRect.bottom - margin;
             } else {
                 laneRect.bottom = outRect.top + margin;
             }
         } else {
-            if (direction == Direction.END) {
+            if (direction == TwoWayLayoutManager.DIRECTION_END) {
                 laneRect.left = outRect.right - margin;
             } else {
                 laneRect.right = outRect.left + margin;
@@ -207,24 +207,24 @@ class Lanes {
     }
 
     public void getChildFrame(Rect outRect, int childWidth, int childHeight, LaneInfo laneInfo,
-                              Direction direction) {
+                              int direction) {
         final Rect startRect = mLanes[laneInfo.startLane];
 
         // The anchor lane only applies when we're get child frame in the direction
         // of the forward scroll. We'll need to rethink this once we start working on
         // RTL support.
         final int anchorLane =
-                (direction == Direction.END ? laneInfo.anchorLane : laneInfo.startLane);
+                (direction == TwoWayLayoutManager.DIRECTION_END ? laneInfo.anchorLane : laneInfo.startLane);
         final Rect anchorRect = mLanes[anchorLane];
 
         if (mIsVertical) {
             outRect.left = startRect.left;
             outRect.top =
-                    (direction == Direction.END ? anchorRect.bottom : anchorRect.top - childHeight);
+                    (direction == TwoWayLayoutManager.DIRECTION_END ? anchorRect.bottom : anchorRect.top - childHeight);
         } else {
             outRect.top = startRect.top;
             outRect.left =
-                    (direction == Direction.END ? anchorRect.right : anchorRect.left - childWidth);
+                    (direction == TwoWayLayoutManager.DIRECTION_END ? anchorRect.right : anchorRect.left - childWidth);
         }
 
         outRect.right = outRect.left + childWidth;
@@ -241,7 +241,7 @@ class Lanes {
         return false;
     }
 
-    private int findLaneThatFitsSpan(int anchorLane, int laneSpan, Direction direction) {
+    private int findLaneThatFitsSpan(int anchorLane, int laneSpan, int direction) {
         final int findStart = Math.max(0, anchorLane - laneSpan + 1);
         final int findEnd = Math.min(findStart + laneSpan, mLanes.length - laneSpan + 1);
         for (int l = findStart; l < findEnd; l++) {
@@ -255,23 +255,23 @@ class Lanes {
             }
         }
 
-        return Lanes.NO_LANE;
+        return Spans.NO_LANE;
     }
 
-    public void findLane(LaneInfo outInfo, int laneSpan, Direction direction) {
+    public void findLane(LaneInfo outInfo, int laneSpan, int direction) {
         outInfo.setUndefined();
 
-        int targetEdge = (direction == Direction.END ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+        int targetEdge = (direction == TwoWayLayoutManager.DIRECTION_END ? Integer.MAX_VALUE : Integer.MIN_VALUE);
         for (int l = 0; l < mLanes.length; l++) {
             final int laneEdge;
             if (mIsVertical) {
-                laneEdge = (direction == Direction.END ? mLanes[l].bottom : mLanes[l].top);
+                laneEdge = (direction == TwoWayLayoutManager.DIRECTION_END ? mLanes[l].bottom : mLanes[l].top);
             } else {
-                laneEdge = (direction == Direction.END ? mLanes[l].right : mLanes[l].left);
+                laneEdge = (direction == TwoWayLayoutManager.DIRECTION_END ? mLanes[l].right : mLanes[l].left);
             }
 
-            if ((direction == Direction.END && laneEdge < targetEdge) ||
-                (direction == Direction.START && laneEdge > targetEdge)) {
+            if ((direction == TwoWayLayoutManager.DIRECTION_END && laneEdge < targetEdge) ||
+                (direction == TwoWayLayoutManager.DIRECTION_START && laneEdge > targetEdge)) {
 
                 final int targetLane = findLaneThatFitsSpan(l, laneSpan, direction);
                 if (targetLane != NO_LANE) {
@@ -282,17 +282,16 @@ class Lanes {
         }
     }
 
-    public void reset(Direction direction) {
-        for (int i = 0; i < mLanes.length; i++) {
-            final Rect laneRect = mLanes[i];
+    public void resetForDirection(int direction) {
+        for (Rect laneRect : mLanes) {
             if (mIsVertical) {
-                if (direction == Direction.START) {
+                if (direction == TwoWayLayoutManager.DIRECTION_START) {
                     laneRect.bottom = laneRect.top;
                 } else {
                     laneRect.top = laneRect.bottom;
                 }
             } else {
-                if (direction == Direction.START) {
+                if (direction == TwoWayLayoutManager.DIRECTION_START) {
                     laneRect.right = laneRect.left;
                 } else {
                     laneRect.left = laneRect.right;
@@ -303,12 +302,10 @@ class Lanes {
         invalidateEdges();
     }
 
-    public void reset(int offset) {
-        for (int i = 0; i < mLanes.length; i++) {
-            final Rect laneRect = mLanes[i];
-
+    public void resetForOffset(int offset) {
+        for (Rect laneRect : mLanes) {
             laneRect.offsetTo(mIsVertical ? laneRect.left : offset,
-                              mIsVertical ? offset : laneRect.top);
+                    mIsVertical ? offset : laneRect.top);
 
             if (mIsVertical) {
                 laneRect.bottom = laneRect.top;
@@ -326,8 +323,9 @@ class Lanes {
         }
 
         mInnerStart = Integer.MIN_VALUE;
-        for (int i = 0; i < mLanes.length; i++) {
-            final Rect laneRect = mLanes[i];
+
+
+        for (Rect laneRect : mLanes) {
             mInnerStart = Math.max(mInnerStart, mIsVertical ? laneRect.top : laneRect.left);
         }
 
@@ -340,8 +338,7 @@ class Lanes {
         }
 
         mInnerEnd = Integer.MAX_VALUE;
-        for (int i = 0; i < mLanes.length; i++) {
-            final Rect laneRect = mLanes[i];
+        for (Rect laneRect : mLanes) {
             mInnerEnd = Math.min(mInnerEnd, mIsVertical ? laneRect.bottom : laneRect.right);
         }
 

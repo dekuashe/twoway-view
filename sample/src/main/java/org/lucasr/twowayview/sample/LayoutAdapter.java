@@ -23,10 +23,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.lucasr.twowayview.TwoWayLayoutManager;
-import org.lucasr.twowayview.widget.TwoWayView;
 import org.lucasr.twowayview.widget.SpannableGridLayoutManager;
 import org.lucasr.twowayview.widget.StaggeredGridLayoutManager;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +80,7 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.SimpleView
     public void onBindViewHolder(SimpleViewHolder holder, int position) {
         holder.title.setText(mItems.get(position).toString());
 
-        boolean isVertical = (mRecyclerView.getOrientation() == TwoWayLayoutManager.Orientation.VERTICAL);
+        boolean isVertical = (mRecyclerView.getOrientation()== RecyclerView.VERTICAL);
         final View itemView = holder.itemView;
 
         final int itemId = mItems.get(position);
