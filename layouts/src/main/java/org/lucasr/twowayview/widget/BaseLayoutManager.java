@@ -128,12 +128,10 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         };
     }
 
-    private enum UpdateOp {
-        ADD,
-        REMOVE,
-        UPDATE,
-        MOVE
-    }
+    public static final int UPDATE_ADD = 0;
+    public static final int UPDATE_REMOVE = 1;
+    public static final int UPDATE_UPDATE = 2;
+    public static final int UPDATE_MOVE = 3;
 
     private Spans mSpans;
     private Spans mSpansToRestore;
@@ -280,19 +278,19 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         return true;
     }
 
-    private void handleUpdate(int positionStart, int itemCountOrToPosition, UpdateOp cmd) {
+    private void handleUpdate(int positionStart, int itemCountOrToPosition, int cmd) {
         invalidateItemLanesAfter(positionStart);
 
         switch (cmd) {
-            case ADD:
+            case UPDATE_ADD:
                 offsetForAddition(positionStart, itemCountOrToPosition);
                 break;
 
-            case REMOVE:
+            case UPDATE_REMOVE:
                 offsetForRemoval(positionStart, itemCountOrToPosition);
                 break;
 
-            case MOVE:
+            case UPDATE_MOVE:
                 offsetForRemoval(positionStart, 1);
                 offsetForAddition(itemCountOrToPosition, 1);
                 break;
@@ -371,25 +369,25 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
 
     @Override
     public void onItemsAdded(RecyclerView recyclerView, int positionStart, int itemCount) {
-        handleUpdate(positionStart, itemCount, UpdateOp.ADD);
+        handleUpdate(positionStart, itemCount, UPDATE_ADD);
         super.onItemsAdded(recyclerView, positionStart, itemCount);
     }
 
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int itemCount) {
-        handleUpdate(positionStart, itemCount, UpdateOp.REMOVE);
+        handleUpdate(positionStart, itemCount, UPDATE_REMOVE);
         super.onItemsRemoved(recyclerView, positionStart, itemCount);
     }
 
     @Override
     public void onItemsUpdated(RecyclerView recyclerView, int positionStart, int itemCount) {
-        handleUpdate(positionStart, itemCount, UpdateOp.UPDATE);
+        handleUpdate(positionStart, itemCount, UPDATE_UPDATE);
         super.onItemsUpdated(recyclerView, positionStart, itemCount);
     }
 
     @Override
     public void onItemsMoved(RecyclerView recyclerView, int from, int to, int itemCount) {
-        handleUpdate(from, to, UpdateOp.MOVE);
+        handleUpdate(from, to, UPDATE_MOVE);
         super.onItemsMoved(recyclerView, from, to, itemCount);
     }
 
