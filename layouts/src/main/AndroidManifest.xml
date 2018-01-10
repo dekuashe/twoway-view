@@ -20,9 +20,6 @@
           android:versionCode="1"
           android:versionName="Alpha 1" >
 
-    <uses-sdk android:minSdkVersion="7"
-              android:targetSdkVersion="16" />
-
     <application/>
 
 </manifest>
