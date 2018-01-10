@@ -32,13 +32,18 @@ import android.view.ViewGroup.MarginLayoutParams;
 import org.lucasr.twowayview.TwoWayLayoutManager;
 import org.lucasr.twowayview.widget.Spans.LaneInfo;
 
-import static org.lucasr.twowayview.widget.Spans.calculateLaneSize;
+import static org.lucasr.twowayview.widget.Spans.calculateLaneSizeH;
+import static org.lucasr.twowayview.widget.Spans.calculateLaneSizeV;
 
 public abstract class BaseLayoutManager extends TwoWayLayoutManager {
     private static final String LOGTAG = "BaseLayoutManager";
 
     public BaseLayoutManager(Context context, int orientation) {
         super(context, orientation);
+    }
+
+    public BaseLayoutManager(Context context, int orientation, float aspectRatio) {
+        super(context, orientation, aspectRatio);
     }
 
     public BaseLayoutManager(Context context, AttributeSet attrs) {
@@ -250,11 +255,13 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         }
 
         final int laneCount = getLaneCount();
-        final int laneSize = calculateLaneSize(this, laneCount);
+        final int laneSizeH = calculateLaneSizeH(this, laneCount);
+        final int laneSizeV = calculateLaneSizeV(this, laneCount);
 
-        return (spans.getOrientation() == getOrientation() &&
-                spans.getCount() == laneCount &&
-                spans.getLaneSize() == laneSize);
+        return (spans.getOrientation() == getOrientation()
+                && spans.getCount() == laneCount
+                && spans.getLaneSizeH() == laneSizeH
+                && spans.getLaneSizeV() == laneSizeV);
     }
 
     private boolean ensureLayoutState() {
@@ -272,8 +279,10 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
             mItemEntries = new ItemEntries();
         }
 
-        if (oldSpans != null && oldSpans.getOrientation() == mSpans.getOrientation() &&
-                oldSpans.getLaneSize() == mSpans.getLaneSize()) {
+        if (oldSpans != null
+                && oldSpans.getOrientation() == mSpans.getOrientation()
+                && oldSpans.getLaneSizeH() == mSpans.getLaneSizeH()
+                && oldSpans.getLaneSizeV() == mSpans.getLaneSizeV()) {
             invalidateItemLanesAfter(0);
         } else {
             mItemEntries.clear();
@@ -414,7 +423,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
             state.lanes[i] = laneRect;
         }
 
-        state.laneSize = (mSpans != null ? mSpans.getLaneSize() : 0);
+        state.laneSizeH = (mSpans != null ? mSpans.getLaneSizeH() : 0);
+        state.laneSizeV = (mSpans != null ? mSpans.getLaneSizeV() : 0);
         state.itemEntries = mItemEntries;
 
         return state;
@@ -424,8 +434,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
     public void onRestoreInstanceState(Parcelable state) {
         final LanedSavedState ss = (LanedSavedState) state;
 
-        if (ss.lanes != null && ss.laneSize > 0) {
-            mSpansToRestore = new Spans(this, getOrientation(), ss.lanes, ss.laneSize);
+        if (ss.lanes != null && (ss.laneSizeH > 0 || ss.laneSizeV > 0)) {
+            mSpansToRestore = new Spans(this, getOrientation(), ss.lanes, ss.laneSizeH, ss.laneSizeV);
             mItemEntriesToRestore = ss.itemEntries;
         } else {
             if(mItemEntries!=null) {
@@ -451,7 +461,7 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
             return 0;
         }
 
-        final int size = getLanes().getLaneSize() * getLaneSpanForChild(child);
+        final int size = getLanes().getLaneSizeH() * getLaneSpanForChild(child);
         return getWidth() - getPaddingLeft() - getPaddingRight() - size;
     }
 
@@ -460,7 +470,7 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
             return 0;
         }
 
-        final int size = getLanes().getLaneSize() * getLaneSpanForChild(child);
+        final int size = getLanes().getLaneSizeV() * getLaneSpanForChild(child);
         return getHeight() - getPaddingTop() - getPaddingBottom() - size;
     }
 
@@ -567,7 +577,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
 
     protected static class LanedSavedState extends SavedState {
         private Rect[] lanes;
-        private int laneSize;
+        private int laneSizeH;
+        private int laneSizeV;
         private ItemEntries itemEntries;
 
         protected LanedSavedState(Parcelable superState) {
@@ -576,7 +587,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
 
         private LanedSavedState(Parcel in) {
             super(in);
-            laneSize = in.readInt();
+            laneSizeH = in.readInt();
+            laneSizeV = in.readInt();
 
             final int laneCount = in.readInt();
             if (laneCount > 0) {
@@ -602,7 +614,8 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
 
-            out.writeInt(laneSize);
+            out.writeInt(laneSizeH);
+            out.writeInt(laneSizeV);
 
             final int laneCount = (lanes != null ? lanes.length : 0);
             out.writeInt(laneCount);

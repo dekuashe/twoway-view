@@ -47,6 +47,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     private OrientationHelper mSecondaryOrientation;
 
     private int mOrientation;
+    private float mAspectRatio;
 
     private RecyclerView mRecyclerView;
 
@@ -61,17 +62,24 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     private int mLayoutEnd;
 
     public TwoWayLayoutManager(Context context, int orientation) {
+        this(context, orientation, 1.0f);
+    }
+
+    public TwoWayLayoutManager(Context context, int orientation, float aspectRatio) {
         mIsVertical = (orientation == RecyclerView.VERTICAL);
+        mAspectRatio = aspectRatio;
     }
 
     public TwoWayLayoutManager(Context context, AttributeSet attrs) {
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.twowayview_TwoWayLayoutManager, 0, 0);
 
         final int orientation = a.getInt(R.styleable.twowayview_TwoWayLayoutManager_android_orientation, RecyclerView.VERTICAL);
+        final float aspectRatio = a.getFloat(R.styleable.twowayview_TwoWayLayoutManager_aspect_ratio, 1.0f);
 
         a.recycle();
 
         mIsVertical = (RecyclerView.VERTICAL == orientation);
+        mAspectRatio = aspectRatio;
     }
 
     private int getTotalSpace() {
@@ -1079,6 +1087,18 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         }
 
         this.mIsVertical = isVertical;
+        requestLayout();
+    }
+
+    public float getAspectRatio() {
+        return mAspectRatio;
+    }
+
+    public void setAspectRatio(float aspectRatio) {
+        if (mAspectRatio == aspectRatio)
+            return;
+
+        mAspectRatio = aspectRatio;
         requestLayout();
     }
 

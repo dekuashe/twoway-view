@@ -28,7 +28,8 @@ class Spans {
     private final boolean mIsVertical;
     private final Rect[] mLanes;
     private final Rect[] mSavedLanes;
-    private final int mLaneSize;
+    private final int mLaneSizeH;
+    private final int mLaneSizeV;
 
     private final Rect mTempRect = new Rect();
     private final LaneInfo mTempLaneInfo = new LaneInfo();
@@ -55,11 +56,12 @@ class Spans {
         }
     }
 
-    public Spans(BaseLayoutManager layout, int orientation, Rect[] lanes, int laneSize) {
+    public Spans(BaseLayoutManager layout, int orientation, Rect[] lanes, int laneSizeH, int laneSizeV) {
         mLayout = layout;
         mIsVertical = (orientation == RecyclerView.VERTICAL);
         mLanes = lanes;
-        mLaneSize = laneSize;
+        mLaneSizeH = laneSizeH;
+        mLaneSizeV = laneSizeV;
 
         mSavedLanes = new Rect[mLanes.length];
         for (int i = 0; i < mLanes.length; i++) {
@@ -78,35 +80,51 @@ class Spans {
             mSavedLanes[i] = new Rect();
         }
 
-        mLaneSize = calculateLaneSize(layout, laneCount);
+        mLaneSizeH = calculateLaneSizeH(layout, laneCount);
+        mLaneSizeV = calculateLaneSizeV(layout, laneCount);
 
         final int paddingLeft = layout.getPaddingLeft();
         final int paddingTop = layout.getPaddingTop();
 
         for (int i = 0; i < laneCount; i++) {
-            final int laneStart = i * mLaneSize;
+            final int laneStartH = i * mLaneSizeH;
+            final int laneStartV = i * mLaneSizeV;
 
-            final int l = paddingLeft + (mIsVertical ? laneStart : 0);
-            final int t = paddingTop + (mIsVertical ? 0 : laneStart);
-            final int r = (mIsVertical ? l + mLaneSize : l);
-            final int b = (mIsVertical ? t : t + mLaneSize);
+            final int l = paddingLeft + (mIsVertical ? laneStartH : 0);
+            final int t = paddingTop + (mIsVertical ? 0 : laneStartV);
+            final int r = (mIsVertical ? l + mLaneSizeH : l);
+            final int b = (mIsVertical ? t : t + mLaneSizeV);
 
             mLanes[i].set(l, t, r, b);
         }
     }
 
-    public static int calculateLaneSize(BaseLayoutManager layout, int laneCount) {
-        if (layout.isVertical()) {
-            final int paddingLeft = layout.getPaddingLeft();
-            final int paddingRight = layout.getPaddingRight();
-            final int width = layout.getWidth() - paddingLeft - paddingRight;
+    public static int calculateLaneSizeH(BaseLayoutManager layout, int laneCount) {
+        final int paddingLeft = layout.getPaddingLeft();
+        final int paddingRight = layout.getPaddingRight();
+        final int width = layout.getWidth() - paddingLeft - paddingRight;
+        final int paddingTop = layout.getPaddingTop();
+        final int paddingBottom = layout.getPaddingBottom();
+        final int height = layout.getHeight() - paddingTop - paddingBottom;
+
+        if (layout.isVertical())
             return width / laneCount;
-        } else {
-            final int paddingTop = layout.getPaddingTop();
-            final int paddingBottom = layout.getPaddingBottom();
-            final int height = layout.getHeight() - paddingTop - paddingBottom;
+        else
+            return (int) (height * layout.getAspectRatio() / laneCount);
+    }
+
+    public static int calculateLaneSizeV(BaseLayoutManager layout, int laneCount) {
+        final int paddingLeft = layout.getPaddingLeft();
+        final int paddingRight = layout.getPaddingRight();
+        final int width = layout.getWidth() - paddingLeft - paddingRight;
+        final int paddingTop = layout.getPaddingTop();
+        final int paddingBottom = layout.getPaddingBottom();
+        final int height = layout.getHeight() - paddingTop - paddingBottom;
+
+        if (layout.isVertical())
+            return (int) (width * layout.getAspectRatio() / laneCount);
+        else
             return height / laneCount;
-        }
     }
 
     private void invalidateEdges() {
@@ -130,8 +148,12 @@ class Spans {
         }
     }
 
-    public int getLaneSize() {
-        return mLaneSize;
+    public int getLaneSizeH() {
+        return mLaneSizeH;
+    }
+
+    public int getLaneSizeV() {
+        return mLaneSizeV;
     }
 
     public int getCount() {
@@ -247,8 +269,8 @@ class Spans {
         for (int l = findStart; l < findEnd; l++) {
             mTempLaneInfo.set(l, anchorLane);
 
-            getChildFrame(mTempRect, mIsVertical ? laneSpan * mLaneSize : 1,
-                    mIsVertical ? 1 : laneSpan * mLaneSize, mTempLaneInfo, direction);
+            getChildFrame(mTempRect, mIsVertical ? laneSpan * mLaneSizeH : 1,
+                    mIsVertical ? 1 : laneSpan * mLaneSizeV, mTempLaneInfo, direction);
 
             if (!intersects(l, laneSpan, mTempRect)) {
                 return l;

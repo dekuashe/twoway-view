@@ -35,8 +35,16 @@ public class GridLayoutManager extends BaseLayoutManager {
         super(context, orientation);
     }
 
+    public GridLayoutManager(Context context, int orientation, float aspectRatio) {
+        super(context, orientation, aspectRatio);
+    }
+
     public GridLayoutManager(Context context, int orientation, int mNumColumns, int mNumRows) {
-        super(context, orientation);
+        this(context, orientation, 1.0f, mNumColumns, mNumRows);
+    }
+
+    public GridLayoutManager(Context context, int orientation, float aspectRatio, int mNumColumns, int mNumRows) {
+        super(context, orientation, aspectRatio);
         this.mNumColumns = mNumColumns;
         this.mNumRows = mNumRows;
     }

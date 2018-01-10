@@ -30,6 +30,10 @@ public class ListLayoutManager extends BaseLayoutManager {
         super(context, orientation);
     }
 
+    public ListLayoutManager(Context context, int orientation, float aspectRatio) {
+        super(context, orientation, aspectRatio);
+    }
+
     public ListLayoutManager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

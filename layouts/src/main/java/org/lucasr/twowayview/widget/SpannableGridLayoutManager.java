@@ -37,6 +37,10 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
         super(context, orientation);
     }
 
+    public SpannableGridLayoutManager(Context context, int orientation, float aspectRatio) {
+        super(context, orientation, aspectRatio);
+    }
+
     public SpannableGridLayoutManager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -81,11 +85,11 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
     private boolean mMeasuring;
 
     private int getChildWidth(int colSpan) {
-        return getLanes().getLaneSize() * colSpan;
+        return getLanes().getLaneSizeH() * colSpan;
     }
 
     private int getChildHeight(int rowSpan) {
-        return getLanes().getLaneSize() * rowSpan;
+        return getLanes().getLaneSizeV() * rowSpan;
     }
 
     private static int getLaneSpan(LayoutParams lp, boolean isVertical) {

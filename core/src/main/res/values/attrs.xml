@@ -19,6 +19,7 @@
 
     <declare-styleable name="twowayview_TwoWayLayoutManager">
         <attr name="android:orientation" tools:ignore="ResourceName"/>
+        <attr name="aspect_ratio" format="float" tools:ignore="ResourceName"/>
     </declare-styleable>
 
 </resources>

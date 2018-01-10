@@ -76,8 +76,16 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
         super(context, orientation);
     }
 
+    public StaggeredGridLayoutManager(Context context, int orientation, float aspectRatio) {
+        super(context, orientation, aspectRatio);
+    }
+
     public StaggeredGridLayoutManager(Context context, int orientation, int numColumns, int numRows) {
         super(context, orientation, numColumns, numRows);
+    }
+
+    public StaggeredGridLayoutManager(Context context, int orientation, float aspectRatio, int numColumns, int numRows) {
+        super(context, orientation, aspectRatio, numColumns, numRows);
     }
 
     public StaggeredGridLayoutManager(Context context, AttributeSet attrs) {
