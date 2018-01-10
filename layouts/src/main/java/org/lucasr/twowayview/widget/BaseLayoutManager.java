@@ -41,6 +41,10 @@ public abstract class BaseLayoutManager extends TwoWayLayoutManager {
         super(context, orientation);
     }
 
+    public BaseLayoutManager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
     protected static class ItemEntry implements Parcelable {
         public int startLane;
         public int anchorLane;

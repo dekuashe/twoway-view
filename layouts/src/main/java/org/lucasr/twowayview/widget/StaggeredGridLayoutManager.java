@@ -80,6 +80,10 @@ public class StaggeredGridLayoutManager extends GridLayoutManager {
         super(context, orientation, numColumns, numRows);
     }
 
+    public StaggeredGridLayoutManager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
     @Override
     int getLaneSpanForChild(View child) {
         LayoutParams lp = (LayoutParams) child.getLayoutParams();

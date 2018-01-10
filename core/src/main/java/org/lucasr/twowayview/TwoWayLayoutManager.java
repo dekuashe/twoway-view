@@ -17,6 +17,7 @@
 package org.lucasr.twowayview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -30,6 +31,7 @@ import android.support.v7.widget.RecyclerView.LayoutParams;
 import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 
@@ -60,6 +62,16 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
     public TwoWayLayoutManager(Context context, int orientation) {
         mIsVertical = (orientation == RecyclerView.VERTICAL);
+    }
+
+    public TwoWayLayoutManager(Context context, AttributeSet attrs) {
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.twowayview_TwoWayLayoutManager, 0, 0);
+
+        final int orientation = a.getInt(R.styleable.twowayview_TwoWayLayoutManager_android_orientation, RecyclerView.VERTICAL);
+
+        a.recycle();
+
+        mIsVertical = (RecyclerView.VERTICAL == orientation);
     }
 
     private int getTotalSpace() {

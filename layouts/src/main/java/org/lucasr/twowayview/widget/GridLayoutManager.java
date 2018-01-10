@@ -17,8 +17,10 @@
 package org.lucasr.twowayview.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView.Recycler;
 import android.support.v7.widget.RecyclerView.State;
+import android.util.AttributeSet;
 import android.view.View;
 
 import org.lucasr.twowayview.widget.Spans.LaneInfo;
@@ -37,6 +39,19 @@ public class GridLayoutManager extends BaseLayoutManager {
         super(context, orientation);
         this.mNumColumns = mNumColumns;
         this.mNumRows = mNumRows;
+    }
+
+    public GridLayoutManager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.twowayview_GridLayoutManager, 0, 0);
+
+        final int cols = a.getInt(R.styleable.twowayview_GridLayoutManager_twowayview_numColumns, 1);
+        final int rows = a.getInt(R.styleable.twowayview_GridLayoutManager_twowayview_numRows, 1);
+
+        a.recycle();
+
+        this.mNumColumns = cols;
+        this.mNumRows = rows;
     }
 
     @Override

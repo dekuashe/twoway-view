@@ -37,6 +37,10 @@ public class SpannableGridLayoutManager extends GridLayoutManager {
         super(context, orientation);
     }
 
+    public SpannableGridLayoutManager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
     protected static class SpannableItemEntry extends BaseLayoutManager.ItemEntry {
         private final int colSpan;
         private final int rowSpan;
