@@ -110,7 +110,7 @@ class Spans {
         if (layout.isVertical())
             return width / laneCount;
         else
-            return (int) (height * layout.getAspectRatio() / laneCount);
+            return (int) (height / layout.getAspectRatio() / laneCount);
     }
 
     public static int calculateLaneSizeV(BaseLayoutManager layout, int laneCount) {
@@ -122,7 +122,7 @@ class Spans {
         final int height = layout.getHeight() - paddingTop - paddingBottom;
 
         if (layout.isVertical())
-            return (int) (width * layout.getAspectRatio() / laneCount);
+            return (int) (width / layout.getAspectRatio() / laneCount);
         else
             return height / laneCount;
     }
