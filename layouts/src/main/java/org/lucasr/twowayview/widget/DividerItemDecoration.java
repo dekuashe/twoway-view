@@ -95,10 +95,18 @@ public class DividerItemDecoration extends ItemDecoration {
 
             final int bottomOffset = childBottom - child.getBottom() - lp.bottomMargin;
             if (bottomOffset > 0 && childBottom < bottomWithPadding) {
-                final int left = childLeft;
-                final int top = childBottom - bottomOffset;
-                final int right = childRight;
-                final int bottom = top + mHorizontalDivider.getIntrinsicHeight();
+                final int left = parent.getPaddingLeft() > childLeft
+                        ? parent.getPaddingLeft()
+                        : childLeft;
+                final int top = parent.getPaddingTop() > childBottom - bottomOffset
+                        ? parent.getPaddingTop()
+                        : childBottom - bottomOffset;
+                final int right = rightWithPadding < childRight
+                        ? rightWithPadding
+                        : childRight;
+                final int bottom = parent.getPaddingTop() > childBottom - bottomOffset
+                        ? top
+                        : top + mHorizontalDivider.getIntrinsicHeight();
 
                 mHorizontalDivider.setBounds(left, top, right, bottom);
                 mHorizontalDivider.draw(c);
@@ -106,10 +114,18 @@ public class DividerItemDecoration extends ItemDecoration {
 
             final int rightOffset = childRight - child.getRight() - lp.rightMargin;
             if (rightOffset > 0 && childRight < rightWithPadding) {
-                final int left = childRight - rightOffset;
-                final int top = childTop;
-                final int right = left + mVerticalDivider.getIntrinsicWidth();
-                final int bottom = childBottom;
+                final int left = parent.getPaddingLeft() > childRight - rightOffset
+                        ? parent.getPaddingLeft()
+                        : childRight - rightOffset;
+                final int top = parent.getPaddingTop() > childTop
+                        ? parent.getPaddingTop()
+                        : childTop;
+                final int right = parent.getPaddingLeft() > childRight - rightOffset
+                        ? left
+                        : left + mVerticalDivider.getIntrinsicWidth();
+                final int bottom = bottomWithPadding < childBottom
+                        ? bottomWithPadding
+                        : childBottom;
 
                 mVerticalDivider.setBounds(left, top, right, bottom);
                 mVerticalDivider.draw(c);

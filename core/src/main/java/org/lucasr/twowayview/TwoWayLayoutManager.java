@@ -94,11 +94,24 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         return (mIsVertical ? getPaddingTop() : getPaddingLeft());
     }
 
+    //completely unnecessary, but makes replacement code more understandable
+    protected int getStartWithoutPadding() {
+        return 0;
+    }
+
     protected int getEndWithPadding() {
         if (mIsVertical) {
             return (getHeight() - getPaddingBottom());
         } else {
             return (getWidth() - getPaddingRight());
+        }
+    }
+
+    protected int getEndWithoutPadding() {
+        if (mIsVertical) {
+            return getHeight();
+        } else {
+            return getWidth();
         }
     }
 
@@ -135,7 +148,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
 
     private void recycleChildrenFromStart(int direction, Recycler recycler) {
         final int childCount = getChildCount();
-        final int childrenStart = getStartWithPadding();
+        final int childrenStart = getStartWithoutPadding();
 
         int detachedCount = 0;
         for (int i = 0; i < childCount; i++) {
@@ -159,7 +172,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     private void recycleChildrenFromEnd(int direction, Recycler recycler) {
-        final int childrenEnd = getEndWithPadding();
+        final int childrenEnd = getEndWithoutPadding();
         final int childCount = getChildCount();
 
         int firstDetachedPos = 0;
@@ -191,21 +204,23 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
             return 0;
         }
 
-        final int start = getStartWithPadding();
-        final int end = getEndWithPadding();
+        final int start = getStartWithoutPadding();
+        final int end = getEndWithoutPadding();
         final int firstPosition = getFirstVisiblePosition();
 
-        final int totalSpace = getTotalSpace();
+        final int totalSpace = getTotalSpace(); //?? mIsVertical?getHeight():getWidth();
         if (delta < 0) {
             delta = Math.max(-(totalSpace - 1), delta);
         } else {
             delta = Math.min(totalSpace - 1, delta);
         }
 
-        final boolean cannotScrollBackward = (firstPosition == 0 &&
-                mLayoutStart >= start && delta <= 0);
-        final boolean cannotScrollForward = (firstPosition + childCount == state.getItemCount() &&
-                mLayoutEnd <= end && delta >= 0);
+        final boolean cannotScrollBackward = (firstPosition == 0
+                && mLayoutStart >= start
+                && delta <= 0);
+        final boolean cannotScrollForward = (firstPosition + childCount == state.getItemCount()
+                && mLayoutEnd + (mIsVertical?getPaddingBottom():getPaddingRight()) <= end
+                && delta >= 0);
 
         if (cannotScrollForward || cannotScrollBackward) {
             return 0;
@@ -244,7 +259,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     private void fillBefore(int position, Recycler recycler, int extraSpace) {
-        final int limit = getStartWithPadding() - extraSpace;
+        final int limit = getStartWithoutPadding() - extraSpace;
 
         while (canAddMoreViews(DIRECTION_START, limit) && position >= 0) {
             makeAndAddView(position, DIRECTION_START, recycler);
@@ -257,7 +272,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
     }
 
     private void fillAfter(int position, Recycler recycler, State state, int extraSpace) {
-        final int limit = getEndWithPadding() + extraSpace;
+        final int limit = getEndWithoutPadding() + extraSpace;
 
         final int itemCount = state.getItemCount();
         while (canAddMoreViews(DIRECTION_END, limit) && position < itemCount) {
@@ -304,13 +319,13 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
         }
 
         // This is bottom of our drawable area.
-        final int start = getStartWithPadding();
-        final int end = getEndWithPadding();
+        final int start = getStartWithoutPadding();
+        final int end = getEndWithoutPadding();
         final int firstPosition = getFirstVisiblePosition();
 
         // This is how far the end edge of the last view is from the end of the
         // drawable area.
-        int endOffset = end - mLayoutEnd;
+        int endOffset = end - mLayoutEnd - (mIsVertical?getPaddingBottom():getPaddingRight());
 
         // Make sure we are 1) Too high, and 2) Either there are more rows above the
         // first row or the first row is scrolled off the top of the drawable area
@@ -342,8 +357,8 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
             return;
         }
 
-        final int start = getStartWithPadding();
-        final int end = getEndWithPadding();
+        final int start = getStartWithoutPadding();
+        final int end = getEndWithoutPadding();
         final int itemCount = state.getItemCount();
         final int lastPosition = getLastVisiblePosition();
 
@@ -383,7 +398,7 @@ public abstract class TwoWayLayoutManager extends LayoutManager {
             return;
         }
 
-        int delta = mLayoutStart - getStartWithPadding();
+        int delta = mLayoutStart - getStartWithoutPadding();
         if (delta < 0) {
             // We only are looking to see if we are too low, not too high
             delta = 0;
